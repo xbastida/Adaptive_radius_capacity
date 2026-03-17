@@ -1,0 +1,13 @@
+[general]
+name=Adaptive Radius Capacity
+qgisMinimumVersion=3.0
+description=Compute an adaptive radius buffers based on capacity and filling targets.
+version=1.0
+author=xabi9
+email=xabi9@example.com
+about=Adaptive Radius Calculator dynamically grows a buffer until origin capacity is filled by target attributes.
+tracker=
+repository=
+category=Vector
+icon=icon.svg
+tags=radius, buffer, capacity
