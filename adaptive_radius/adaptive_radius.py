@@ -43,13 +43,15 @@ class AdaptiveRadiusPlugin:
             origin_layer = dialog.combo_origins.currentLayer()
             target_layer = dialog.combo_targets.currentLayer()
             cap_field = dialog.combo_cap_field.currentField()
+            cap_default = dialog.spin_cap_def.value()
             fill_field = dialog.combo_fill_field.currentField()
+            fill_default = dialog.spin_fill_def.value()
             step_m = dialog.spin_step.value()
             max_m = dialog.spin_max.value()
             crs_str = dialog.edit_crs.text()
             
-            if not origin_layer or not target_layer or not cap_field or not fill_field:
-                QMessageBox.warning(self.iface.mainWindow(), "Error", "Please select valid layers and fields.")
+            if not origin_layer or not target_layer:
+                QMessageBox.warning(self.iface.mainWindow(), "Error", "Please select valid Origin and Target layers.")
                 return
             
             # Show progress on QGIS MessageBar
@@ -61,7 +63,9 @@ class AdaptiveRadiusPlugin:
                     origin_layer=origin_layer, 
                     target_layer=target_layer, 
                     capacity_col=cap_field, 
+                    capacity_default=cap_default,
                     filling_col=fill_field, 
+                    filling_default=fill_default,
                     step_m=step_m,
                     max_radius_m=max_m,
                     projected_crs_str=crs_str

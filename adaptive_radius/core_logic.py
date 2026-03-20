@@ -18,7 +18,9 @@ def compute_adaptive_radius(
     origin_layer: QgsVectorLayer,
     target_layer: QgsVectorLayer,
     capacity_col: str,
+    capacity_default: float,
     filling_col: str,
+    filling_default: float,
     step_m: float = 20.0,
     max_radius_m: float = 10_000.0,
     projected_crs_str: str = "EPSG:25830",
@@ -34,9 +36,7 @@ def compute_adaptive_radius(
     proj_to_orig = QgsCoordinateTransform(proj_crs, origin_layer.crs(), transform_context)
 
     # 2. Extract targets
-    target_idx = target_layer.fields().lookupField(filling_col)
-    if target_idx == -1:
-        raise ValueError(f"filling_col '{filling_col}' not found in targets. Available: {[f.name() for f in target_layer.fields()]}")
+    target_idx = target_layer.fields().lookupField(filling_col) if filling_col else -1
         
     target_sindex = QgsSpatialIndex()
     target_data = {} # fid -> (x, y, filling)
@@ -61,10 +61,13 @@ def compute_adaptive_radius(
         new_f.setGeometry(centroid_geom)
         target_sindex.insertFeature(new_f)
         
-        try:
-            fill_val = float(f.attributes()[target_idx])
-        except (ValueError, TypeError):
-            fill_val = 0.0
+        if target_idx != -1:
+            try:
+                fill_val = float(f.attributes()[target_idx])
+            except (ValueError, TypeError):
+                fill_val = 0.0
+        else:
+            fill_val = filling_default
             
         target_data[f.id()] = (pt.x(), pt.y(), fill_val)
 
@@ -84,9 +87,7 @@ def compute_adaptive_radius(
     res_pr.addAttributes(fields.toList())
     res_layer.updateFields()
     
-    cap_idx = origin_layer.fields().lookupField(capacity_col)
-    if cap_idx == -1:
-        raise ValueError(f"capacity_col '{capacity_col}' not found in origins. Available: {[f.name() for f in origin_layer.fields()]}")
+    cap_idx = origin_layer.fields().lookupField(capacity_col) if capacity_col else -1
 
     out_features = []
     
@@ -106,10 +107,13 @@ def compute_adaptive_radius(
         pt = centroid_geom.asPoint()
         ox, oy = pt.x(), pt.y()
         
-        try:
-            capacity = float(f.attributes()[cap_idx])
-        except (ValueError, TypeError):
-            capacity = 0.0
+        if cap_idx != -1:
+            try:
+                capacity = float(f.attributes()[cap_idx])
+            except (ValueError, TypeError):
+                capacity = 0.0
+        else:
+            capacity = capacity_default
             
         radius = step_m
         final_filling = 0.0
