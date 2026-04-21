@@ -24,6 +24,7 @@ def compute_adaptive_radius(
     step_m: float = 20.0,
     max_radius_m: float = 10_000.0,
     projected_crs_str: str = "EPSG:25830",
+    exact_match: bool = False
 ) -> QgsVectorLayer:
     """Compute an adaptive radius for every origin point using pure PyQGIS API."""
     
@@ -128,14 +129,29 @@ def compute_adaptive_radius(
             candidate_ids = target_sindex.intersects(rect)
             
             filling_sum = 0.0
+            targets_in_radius = []
             for cid in candidate_ids:
                 tx, ty, t_fill = target_data[cid]
                 dist = math.sqrt((tx - ox)**2 + (ty - oy)**2)
                 if dist <= radius:
                     filling_sum += t_fill
+                    if exact_match:
+                        targets_in_radius.append((dist, t_fill))
                     
             if filling_sum >= capacity:
-                final_filling = filling_sum
+                if exact_match:
+                    targets_in_radius.sort(key=lambda t: t[0])
+                    acc_fill = 0.0
+                    exact_rad = radius
+                    for d, t_fill_val in targets_in_radius:
+                        acc_fill += t_fill_val
+                        exact_rad = d
+                        if acc_fill >= capacity:
+                            break
+                    final_filling = acc_fill
+                    radius = exact_rad
+                else:
+                    final_filling = filling_sum
                 found = True
                 break
                 

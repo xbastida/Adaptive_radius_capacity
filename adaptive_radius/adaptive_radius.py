@@ -50,6 +50,8 @@ class AdaptiveRadiusPlugin:
             max_m = dialog.spin_max.value()
             crs_str = dialog.edit_crs.text()
             
+            exact_match = dialog.check_exact.isChecked()
+            
             if not origin_layer or not target_layer:
                 QMessageBox.warning(self.iface.mainWindow(), "Error", "Please select valid Origin and Target layers.")
                 return
@@ -68,7 +70,8 @@ class AdaptiveRadiusPlugin:
                     filling_default=fill_default,
                     step_m=step_m,
                     max_radius_m=max_m,
-                    projected_crs_str=crs_str
+                    projected_crs_str=crs_str,
+                    exact_match=exact_match
                 )
                 
                 res_layer.setName(f"Adaptive Radii ({step_m}m step)")

@@ -20,7 +20,9 @@ class AdaptiveRadiusDialog(QtWidgets.QDialog):
                 "fill_default": "Or fixed Filling (if no field):",
                 "step": "Step (m):",
                 "max_rad": "Max Radius (m):",
-                "crs": "Projected CRS (Metric):"
+                "crs": "Projected CRS (Metric):",
+                "adv_group": "Advanced Options",
+                "exact_match": "Exact Match (Finds precise target distance, slower)"
             },
             "es": {
                 "title": "Calculadora de Radio Adaptativo",
@@ -32,7 +34,9 @@ class AdaptiveRadiusDialog(QtWidgets.QDialog):
                 "fill_default": "O Llenado fijo (si no hay campo):",
                 "step": "Paso (m):",
                 "max_rad": "Radio Máximo (m):",
-                "crs": "CRS Proyectado (Métrico):"
+                "crs": "CRS Proyectado (Métrico):",
+                "adv_group": "Opciones Avanzadas",
+                "exact_match": "Coincidencia Exacta (Encuentra distancia precisa, más lento)"
             }
         }
         
@@ -133,6 +137,15 @@ class AdaptiveRadiusDialog(QtWidgets.QDialog):
         self.spin_max.setValue(10000.0)
         max_layout.addWidget(self.spin_max)
         layout.addLayout(max_layout)
+        
+        # Advanced Settings Group
+        self.group_adv = QtWidgets.QGroupBox(self.strings["en"]["adv_group"])
+        adv_layout = QtWidgets.QVBoxLayout(self.group_adv)
+        
+        self.check_exact = QtWidgets.QCheckBox(self.strings["en"]["exact_match"], self)
+        adv_layout.addWidget(self.check_exact)
+        
+        layout.addWidget(self.group_adv)
 
         # Projected CRS
         crs_layout = QtWidgets.QHBoxLayout()
@@ -167,3 +180,6 @@ class AdaptiveRadiusDialog(QtWidgets.QDialog):
         self.lbl_step.setText(s["step"])
         self.lbl_max.setText(s["max_rad"])
         self.lbl_crs.setText(s["crs"])
+        
+        self.group_adv.setTitle(s["adv_group"])
+        self.check_exact.setText(s["exact_match"])
